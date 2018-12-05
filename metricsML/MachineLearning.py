@@ -2,8 +2,8 @@ import numpy as np           # Reading CSV ans saving vectors as binary files
 import tensorflow as tf      # Tensorflow
 from tensorflow import keras # Simplified Tensorflow Framework
 from tensorflow.keras import regularizers
+from tensorflow.keras import callbacks
 import matplotlib.pyplot as plt
-import math
 
 def plotWeights(model):
     for layer in model.get_weights():
@@ -27,7 +27,7 @@ def saveModel(model, folder="data/"):
     print("Finished with saving")
     file.close();
 
-def binaryClassification(train_data, train_labels,test_data,test_labels, nEpochs, lrate, layerSize, rp=0.01, columns=None):
+def binaryClassification(train_data, train_labels, test_data, test_labels, nEpochs, lrate, layerSize, rp=0.01, columns=None):
     ### Read input data    ###
 #     # Training data (80%)
 #     train_data=np.load(folder + "train_data.npy")
@@ -41,6 +41,7 @@ def binaryClassification(train_data, train_labels,test_data,test_labels, nEpochs
         test_data  = test_data[:, columns]    
     
     ### Define Neuronal Network
+    cbks = [callbacks.TerminateOnNaN()]
     layers=[keras.layers.Dense(i, activation=tf.nn.relu, kernel_regularizer=regularizers.l2(rp)) for i in layerSize]
     layers.append(keras.layers.Dense(1, activation=tf.nn.sigmoid))
     model = keras.Sequential(layers)
@@ -50,11 +51,12 @@ def binaryClassification(train_data, train_labels,test_data,test_labels, nEpochs
                   metrics   = ['accuracy'])
     ### Execute model
 #     history =  model.fit(train_data, train_labels, epochs=nEpochs, verbose=1, validation_data=[test_data,test_labels]) #--> Use this to grep & plot this per Epochs (last line)
-    history = model.fit(train_data, train_labels, epochs=nEpochs, verbose=0)
+    history = model.fit(train_data, train_labels, callbacks=cbks, epochs=nEpochs, verbose=0)
     test_loss, test_acc = model.evaluate(test_data, test_labels, verbose=0)
     
-    if (math.isnan(history.history['loss'])):
-        print("Loss was Not a number")
+#     if (math.isnan(history.history['loss'])):
+    if (np.isnan(history.history['loss']).any()):
+        raise ValueError("Loss was not a number")
     
     plt.plot(history.history['acc'])
 #     plt.plot(history.history['val_acc'])

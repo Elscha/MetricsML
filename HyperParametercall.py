@@ -64,10 +64,10 @@ def hyperParameterOptimization(train_data_file, train_labels_file, test_data_fil
     printResults("Final Results:", best_loss, best_accuracy, best_columns, best_layer, best_epoch, best_lr, best_rp)
     
 def hyperParameterOptimization2(train_data_file, train_labels_file, test_data_file, test_labels_file, columnsList):
-    train_data, train_labels, test_data, test_labels = loadAndNormalizeData(train_data_file, train_labels_file, test_data_file, test_labels_file, NormalizationType.LOGARITHM)
+    train_data, train_labels, test_data, test_labels = loadAndNormalizeData(train_data_file, train_labels_file, test_data_file, test_labels_file, NormalizationType.NO_NORMALIZATION)
     
 #     layers                   = [[8], [8, 16], [8, 16, 32]]
-    layers                   = [[8192]]
+    layers                   = [[128]]
 #     epochs                   = [4, 10, 20]
     epochs                   = [20]
 #     learningRates            = [0.001, 0.01]
@@ -96,7 +96,7 @@ def hyperParameterOptimization2(train_data_file, train_labels_file, test_data_fi
                             printResults("New Intermediate Result:", best_loss, best_accuracy, best_columns, best_layer, best_epoch, best_lr, best_rp)
     printResults("Final Results:", best_loss, best_accuracy, best_columns, best_layer, best_epoch, best_lr, best_rp)
 
-hyperParameterOptimization2("data/train_data.npy", "data/train_labels.npy", "data/test_data.npy", "data/test_labels.npy", [list(range(1, 7790))])
+hyperParameterOptimization2("data/train_data.npy", "data/train_labels.npy", "data/test_data.npy", "data/test_labels.npy", [list(range(7000, 7790))])
 
 
 # readFromSingleFile()
