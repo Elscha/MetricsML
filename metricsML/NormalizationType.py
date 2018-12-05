@@ -1,5 +1,6 @@
 from enum import Enum
 
 class NormalizationType(Enum):
-    PERCENTAGE = 1
-    LOGARITHM  = 2
+    NO_NORMALIZATION = 1
+    PERCENTAGE       = 2
+    LOGARITHM        = 3

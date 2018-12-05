@@ -7,7 +7,9 @@ def normalization(normalization, train_data, test_data, validation_data=None):
         print("Unknown normalization specified, use " + str(NormalizationType.PERCENTAGE) + " for normalizing data")
         normalization = NormalizationType.PERCENTAGE;
     
-    if (normalization is NormalizationType.PERCENTAGE):
+    if (normalization is NormalizationType.NO_NORMALIZATION):
+        print("No normalization selected")
+    elif (normalization is NormalizationType.PERCENTAGE):
         __percentageNormalization(train_data, test_data, validation_data)
     elif (normalization is NormalizationType.LOGARITHM):
         __logarithmNormalization(train_data, test_data, validation_data)

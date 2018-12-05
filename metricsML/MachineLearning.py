@@ -3,6 +3,7 @@ import tensorflow as tf      # Tensorflow
 from tensorflow import keras # Simplified Tensorflow Framework
 from tensorflow.keras import regularizers
 import matplotlib.pyplot as plt
+import math
 
 def plotWeights(model):
     for layer in model.get_weights():
@@ -52,13 +53,16 @@ def binaryClassification(train_data, train_labels,test_data,test_labels, nEpochs
     history = model.fit(train_data, train_labels, epochs=nEpochs, verbose=0)
     test_loss, test_acc = model.evaluate(test_data, test_labels, verbose=0)
     
-#     plt.plot(history.history['acc'])
+    if (math.isnan(history.history['loss'])):
+        print("Loss was Not a number")
+    
+    plt.plot(history.history['acc'])
 #     plt.plot(history.history['val_acc'])
-#     plt.title('Model accuracy')
-#     plt.ylabel('Accuracy')
-#     plt.xlabel('Epoch')
-#     plt.legend(['Train', 'Test'], loc='upper left')
-#     #plt.show()
-# #     saveModel(model);
-#     plotWeights(model)
+    plt.title('Model accuracy')
+    plt.ylabel('Accuracy')
+    plt.xlabel('Epoch')
+    plt.legend(['Train', 'Test'], loc='upper left')
+    #plt.show()
+#     saveModel(model);
+    plotWeights(model)
     return test_loss, test_acc

@@ -1,7 +1,7 @@
 import metricsML.MetricsML as ml
 import numpy as np           # Reading CSV ans saving vectors as binary files
 from metricsML.NormalizationType import NormalizationType
-import sys # See: https://stackoverflow.com/a/39784510
+# import sys # See: https://stackoverflow.com/a/39784510
 
 # import metricsML.* as ml
 def printResults(message, loss, accuracy, columns, layer, epoch, lr, rp):
@@ -14,7 +14,7 @@ def printResults(message, loss, accuracy, columns, layer, epoch, lr, rp):
     print("  Learning Rate:            " + str(lr))
     print("  Regularization Parameter: " + str(rp))
 
-def hyperParameterOptimization(train_data_file, train_labels_file, test_data_file, test_labels_file, startIndex, endIndex):
+def loadAndNormalizeData(train_data_file, train_labels_file, test_data_file, test_labels_file, normalizationType):
     print("Reading input data")
     # Training data (80%)
     train_data=np.load(train_data_file)
@@ -26,6 +26,11 @@ def hyperParameterOptimization(train_data_file, train_labels_file, test_data_fil
     print("Data read")
     ml.normalization(NormalizationType.PERCENTAGE, train_data, test_data)
     print("Data normalized")
+    
+    return train_data, train_labels, test_data, test_labels
+
+def hyperParameterOptimization(train_data_file, train_labels_file, test_data_file, test_labels_file, startIndex, endIndex):
+    train_data, train_labels, test_data, test_labels = loadAndNormalizeData(train_data_file, train_labels_file, test_data_file, test_labels_file, NormalizationType.PERCENTAGE)
     
 #     layers                   = [[8], [8, 16], [8, 16, 32]]
     layers                   = [[8]]
@@ -57,8 +62,41 @@ def hyperParameterOptimization(train_data_file, train_labels_file, test_data_fil
                             best_rp = rp
                             printResults("New Intermediate Result:", best_loss, best_accuracy, best_columns, best_layer, best_epoch, best_lr, best_rp)
     printResults("Final Results:", best_loss, best_accuracy, best_columns, best_layer, best_epoch, best_lr, best_rp)
+    
+def hyperParameterOptimization2(train_data_file, train_labels_file, test_data_file, test_labels_file, columnsList):
+    train_data, train_labels, test_data, test_labels = loadAndNormalizeData(train_data_file, train_labels_file, test_data_file, test_labels_file, NormalizationType.LOGARITHM)
+    
+#     layers                   = [[8], [8, 16], [8, 16, 32]]
+    layers                   = [[8192]]
+#     epochs                   = [4, 10, 20]
+    epochs                   = [20]
+#     learningRates            = [0.001, 0.01]
+    learningRates            = [0.001]
+#     regularizationParameters = [0.05, 0.1, 0.15, 0.2]
+    regularizationParameters = [0.05, 0.1]
+    
+    best_loss     = 1000000
+    best_accuracy = 0
+    
+    for columns in columnsList:
+        for layer in layers:
+            for epoch in epochs:
+                print(str(columns) + " columns in " + str(layer) + " layers in " + str(epoch) + " epochs")
+                for lr in learningRates:
+                    for rp in regularizationParameters:
+                        tlos, tacc = ml.binaryClassification(train_data,train_labels, test_data,test_labels, epoch, lr, layer, columns, rp)
+                        if (tacc > best_accuracy):
+                            best_loss = tlos
+                            best_accuracy = tacc
+                            best_columns = columns
+                            best_layer = layer
+                            best_epoch = epoch
+                            best_lr = lr
+                            best_rp = rp
+                            printResults("New Intermediate Result:", best_loss, best_accuracy, best_columns, best_layer, best_epoch, best_lr, best_rp)
+    printResults("Final Results:", best_loss, best_accuracy, best_columns, best_layer, best_epoch, best_lr, best_rp)
 
-hyperParameterOptimization("data/train_data.npy", "data/train_labels.npy", "data/test_data.npy", "data/test_labels.npy", int(sys.argv[1]), int(sys.argv[2]))
+hyperParameterOptimization2("data/train_data.npy", "data/train_labels.npy", "data/test_data.npy", "data/test_labels.npy", [list(range(1, 7790))])
 
 
 # readFromSingleFile()
